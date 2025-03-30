@@ -8,6 +8,8 @@ REALM_NAME="dev-realm"
 EXPORT_DIR="./keycloak-config"
 REALM_FILE="$EXPORT_DIR/realm-export.json"
 KEYCLOAK_PORT=9000
+ADMIN_USER="admin"
+ADMIN_PASSWORD="admin"
 
 function create_realm_file() {
   echo "🧹 Cleaning old config folder..."
@@ -67,9 +69,11 @@ function start_keycloak() {
   create_realm_file
 
   echo "🚀 Starting keycloak in background on http://localhost:$KEYCLOAK_PORT ..."
-  docker run -d \
+  docker run -d --rm \
     --name "$CONTAINER_NAME" \
     -p $KEYCLOAK_PORT:8080 \
+    -e KEYCLOAK_ADMIN=$ADMIN_USER \
+    -e KEYCLOAK_ADMIN_PASSWORD=$ADMIN_PASSWORD \
     -v "$(pwd)/$EXPORT_DIR":/opt/keycloak/data/import \
     $KEYCLOAK_IMAGE \
     start-dev --import-realm
